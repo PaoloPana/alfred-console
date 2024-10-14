@@ -11,10 +11,10 @@ const INPUT_TOPIC: &'static str = "console";
 
 #[tokio::main]
 async fn main() -> Result<(), Error> {
-    let module = InterfaceModule::new(MODULE_NAME.to_string()).await?;
+    let module = InterfaceModule::new(MODULE_NAME).await?;
     let mut publisher = module.connection.publisher;
     let mut subscriber = module.connection.subscriber;
-    subscriber.listen(INPUT_TOPIC.to_string()).await?;
+    subscriber.listen(INPUT_TOPIC).await?;
     tokio::spawn(async move {
         async move {
             loop {
@@ -26,7 +26,7 @@ async fn main() -> Result<(), Error> {
                 message.text = text.clone();
                 message.message_type = MessageType::TEXT;
                 message.response_topics = LinkedList::from([INPUT_TOPIC.to_string()]);
-                match publisher.send(topic.clone(), &message).await.is_ok() {
+                match publisher.send(topic.as_str(), &message).await.is_ok() {
                     true => println!(" > {topic}: {text}"),
                     false => println!(" * Error sending message \"{text}\" to {topic}")
                 }
