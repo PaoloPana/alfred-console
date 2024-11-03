@@ -6,10 +6,11 @@ use alfred_rs::message::{Message, MessageType};
 use alfred_rs::tokio;
 use scanf::scanf;
 
-const MODULE_NAME: &'static str = "console";
-const INPUT_TOPIC: &'static str = "console";
+const MODULE_NAME: &str = "console";
+const INPUT_TOPIC: &str = "console";
 
 #[tokio::main]
+#[allow(clippy::print_stdout)]
 async fn main() -> Result<(), Error> {
     let module = InterfaceModule::new(MODULE_NAME).await?;
     let mut publisher = module.connection.publisher;
@@ -22,13 +23,16 @@ async fn main() -> Result<(), Error> {
                 let mut text = String::new();
                 println!("Insert message to send to a specific topic (topic: text): ");
                 if scanf!("{}: {}", topic, text).is_err() { continue; }
-                let mut message = Message::empty();
-                message.text = text.clone();
-                message.message_type = MessageType::TEXT;
-                message.response_topics = LinkedList::from([INPUT_TOPIC.to_string()]);
-                match publisher.send(topic.as_str(), &message).await.is_ok() {
-                    true => println!(" > {topic}: {text}"),
-                    false => println!(" * Error sending message \"{text}\" to {topic}")
+                let message = Message {
+                    text: text.clone(),
+                    message_type: MessageType::TEXT,
+                    response_topics: LinkedList::from([INPUT_TOPIC.to_string()]),
+                    ..Message::default()
+                };
+                if publisher.send(topic.as_str(), &message).await.is_ok() {
+                    println!(" > {topic}: {text}");
+                } else {
+                    println!(" * Error sending message \"{text}\" to {topic}");
                 }
             }
         }.await;
@@ -37,10 +41,10 @@ async fn main() -> Result<(), Error> {
         let (topic, message) = subscriber.receive().await?;
         match message.message_type {
             MessageType::TEXT => {
-                println!(" < {}: {}", topic, message.text)
+                println!(" < {}: {}", topic, message.text);
             },
-            _ => {
-                println!(" < {}[{}]: {}", topic, message.message_type, message.text)
+            MessageType::UNKNOWN | MessageType::AUDIO | MessageType::PHOTO => {
+                println!(" < {}[{}]: {}", topic, message.message_type, message.text);
             }
         }
 
