@@ -1,7 +1,7 @@
 use std::collections::LinkedList;
 use alfred_rs::connection::{Receiver, Sender};
 use alfred_rs::error::Error;
-use alfred_rs::interface_module::InterfaceModule;
+use alfred_rs::AlfredModule;
 use alfred_rs::message::{Message, MessageType};
 use alfred_rs::tokio;
 use scanf::scanf;
@@ -12,7 +12,7 @@ const INPUT_TOPIC: &str = "console";
 #[tokio::main]
 #[allow(clippy::print_stdout)]
 async fn main() -> Result<(), Error> {
-    let module = InterfaceModule::new(MODULE_NAME).await?;
+    let module = AlfredModule::new(MODULE_NAME).await?;
     let mut publisher = module.connection.publisher;
     let mut subscriber = module.connection.subscriber;
     subscriber.listen(INPUT_TOPIC).await?;
@@ -25,7 +25,7 @@ async fn main() -> Result<(), Error> {
                 if scanf!("{}: {}", topic, text).is_err() { continue; }
                 let message = Message {
                     text: text.clone(),
-                    message_type: MessageType::TEXT,
+                    message_type: MessageType::Text,
                     response_topics: LinkedList::from([INPUT_TOPIC.to_string()]),
                     ..Message::default()
                 };
@@ -40,10 +40,10 @@ async fn main() -> Result<(), Error> {
     loop {
         let (topic, message) = subscriber.receive().await?;
         match message.message_type {
-            MessageType::TEXT => {
+            MessageType::Text => {
                 println!(" < {}: {}", topic, message.text);
             },
-            MessageType::UNKNOWN | MessageType::AUDIO | MessageType::PHOTO => {
+            MessageType::Unknown | MessageType::Audio | MessageType::Photo | MessageType::ModuleInfo => {
                 println!(" < {}[{}]: {}", topic, message.message_type, message.text);
             }
         }
