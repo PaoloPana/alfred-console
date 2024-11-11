@@ -1,5 +1,4 @@
 use std::collections::LinkedList;
-use alfred_rs::connection::{Receiver, Sender};
 use alfred_rs::error::Error;
 use alfred_rs::AlfredModule;
 use alfred_rs::message::{Message, MessageType};
@@ -12,10 +11,10 @@ const INPUT_TOPIC: &str = "console";
 #[tokio::main]
 #[allow(clippy::print_stdout)]
 async fn main() -> Result<(), Error> {
-    let module = AlfredModule::new(MODULE_NAME).await?;
-    let mut publisher = module.connection.publisher;
-    let mut subscriber = module.connection.subscriber;
-    subscriber.listen(INPUT_TOPIC).await?;
+    let mut module = AlfredModule::new(MODULE_NAME).await?;
+    module.listen(INPUT_TOPIC).await?;
+    let publisher = module.connection.clone();
+    let subscriber = module.connection.clone();
     tokio::spawn(async move {
         async move {
             loop {
@@ -46,7 +45,7 @@ async fn main() -> Result<(), Error> {
         }.await;
     });
     loop {
-        let (topic, message) = subscriber.receive().await?;
+        let (topic, message) = subscriber.receive_all().await?;
         match message.message_type {
             MessageType::Text => {
                 println!(" < {}: {}", topic, message.text);
