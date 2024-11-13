@@ -54,6 +54,8 @@ async fn main() -> Result<(), Error> {
                 println!(" < {}[{}]: {}", topic, message.message_type, message.text);
             }
         }
-
+        message.params.iter().for_each(|(k, v)| {
+            println!("   - {k}: {v}");
+        });
     }
 }
