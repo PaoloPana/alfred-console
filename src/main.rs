@@ -11,7 +11,7 @@ const INPUT_TOPIC: &str = "console";
 #[tokio::main]
 #[allow(clippy::print_stdout)]
 async fn main() -> Result<(), Error> {
-    let mut module = AlfredModule::new(MODULE_NAME).await?;
+    let mut module = AlfredModule::new(MODULE_NAME, env!("CARGO_PKG_VERSION")).await?;
     module.listen(INPUT_TOPIC).await?;
     let publisher = module.connection.clone();
     let subscriber = module.connection.clone();
