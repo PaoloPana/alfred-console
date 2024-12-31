@@ -1,8 +1,8 @@
 use std::collections::LinkedList;
-use alfred_rs::error::Error;
-use alfred_rs::AlfredModule;
-use alfred_rs::message::{Message, MessageType};
-use alfred_rs::tokio;
+use alfred_core::error::Error;
+use alfred_core::AlfredModule;
+use alfred_core::message::{Message, MessageType};
+use alfred_core::tokio;
 use scanf::scanf;
 
 const MODULE_NAME: &str = "console";
