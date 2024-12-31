@@ -77,8 +77,6 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-      - name: Install dependencies
-        run: sudo apt-get install node-semver -y
       - name: Apply version and date in CHANGELOG.md file
         run: sed -i "s/^\#\# \[Unreleased\] - yyyy-mm-dd$/\#\# [${{needs.check-version.outputs.version}}] - $(date +'%Y-%m-%d')/g" CHANGELOG.md
       - name: Push changes and create tag

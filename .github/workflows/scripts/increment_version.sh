@@ -2,7 +2,10 @@
 set -xeu
 
 version="$1"
-new_version=$(semver -i minor "$version")
+IFS=. read -r v1 v2 v3 <<< "${version}"
+((v2++))
+v3=0
+new_version="${v1}.${v2}.${v3}"
 IFS=";"
 for crate_path in $CRATE_PATHS; do
     cd "$crate_path"
