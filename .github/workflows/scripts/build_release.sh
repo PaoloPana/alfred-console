@@ -11,5 +11,5 @@ OUT_FOLDER="alfred-console"
 BIN_FOLDER="target/${ARCH}-unknown-linux-gnu/release"
 mkdir $OUT_FOLDER
 cp $BIN_FOLDER/alfred-console $OUT_FOLDER/
-
-tar czf alfred-console_${ARCH}.tar.gz $OUT_FOLDER
+cd $OUT_FOLDER
+tar czf ../alfred-console_${ARCH}.tar.gz *
