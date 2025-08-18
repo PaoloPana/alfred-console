@@ -5,7 +5,7 @@ edition = "2021"
 
 [dependencies]
 alfred-core = "0.1"
-scanf = "1.2.1"
+scanf = "2.0.0"
 
 [lints.clippy]
 all = { level = "deny", priority = -1 }
