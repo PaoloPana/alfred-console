@@ -31,7 +31,7 @@ async fn main() -> Result<(), Error> {
                     response_topics.split(' ').map(String::from).collect()
                 };
                 let message = Message {
-                    text: text.clone(),
+                    payload: text.clone().into(),
                     message_type: MessageType::Text,
                     response_topics,
                     ..Message::default()
@@ -48,10 +48,10 @@ async fn main() -> Result<(), Error> {
         let (topic, message) = subscriber.receive_all().await?;
         match message.message_type {
             MessageType::Text => {
-                println!(" < {}: {}", topic, message.text);
+                println!(" < {}: {}", topic, message.payload_description());
             },
-            MessageType::Unknown | MessageType::Audio | MessageType::Photo | MessageType::ModuleInfo => {
-                println!(" < {}[{}]: {}", topic, message.message_type, message.text);
+            MessageType::Unknown | MessageType::Audio | MessageType::Photo | MessageType::ModuleInfo | _ => {
+                println!(" < {}[{}]: {}", topic, message.message_type, message.payload_description());
             }
         }
         message.params.iter().for_each(|(k, v)| {
